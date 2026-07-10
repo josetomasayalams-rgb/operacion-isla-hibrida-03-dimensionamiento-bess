@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Explorador educativo de potencia, energía, SOC y autonomía para dimensionamiento BESS.">
+  <title>Dimensionamiento BESS · Academia de operación en isla</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="site-shell">
+    <header class="site-header">
+      <div>
+        <p class="eyebrow">Módulo 03 · Dimensionamiento BESS</p>
+        <h1>MW y MWh resuelven problemas distintos</h1>
+        <p class="lede">La potencia permite tomar la carga y sobrevivir escalones; la energía determina cuánto dura la isla. La ventana SOC y la eficiencia separan la placa nominal de la energía realmente utilizable.</p>
+      </div>
+      <div class="header-meta">
+        <strong>Modelo de factibilidad <span class="evidence-tag">E</span></strong>
+        Sizing preliminar;<br>
+        no garantía OEM <span class="evidence-tag">P</span>
+      </div>
+    </header>
+
+    <section class="control-panel" aria-labelledby="sizing-controls">
+      <h2 id="sizing-controls" class="sr-only">Parámetros de dimensionamiento</h2>
+      <div class="control-row">
+        <div class="field"><label for="critical-load"><span>Carga crítica sostenida</span><output id="critical-load-value" for="critical-load">6,0 MW</output></label><input id="critical-load" type="range" min="1" max="15" step="0.5" value="6"></div>
+        <div class="field"><label for="maximum-step"><span>Escalón adicional</span><output id="maximum-step-value" for="maximum-step">2,0 MW</output></label><input id="maximum-step" type="range" min="0" max="8" step="0.5" value="2"></div>
+        <div class="field"><label for="autonomy"><span>Autonomía objetivo</span><output id="autonomy-value" for="autonomy">4,0 h</output></label><input id="autonomy" type="range" min="0.5" max="12" step="0.5" value="4"></div>
+        <div class="field"><label for="bess-power"><span>Potencia BESS instalada</span><output id="bess-power-value" for="bess-power">5,0 MW</output></label><input id="bess-power" type="range" min="1" max="20" step="0.5" value="5"></div>
+        <div class="field"><label for="bess-energy"><span>Energía nominal BESS</span><output id="bess-energy-value" for="bess-energy">24 MWh</output></label><input id="bess-energy" type="range" min="2" max="100" step="2" value="24"></div>
+        <div class="field"><label for="soc-window"><span>Ventana SOC utilizable</span><output id="soc-window-value" for="soc-window">70 %</output></label><input id="soc-window" type="range" min="30" max="90" step="5" value="70"></div>
+        <div class="field"><label for="efficiency"><span>Eficiencia de descarga</span><output id="efficiency-value" for="efficiency">92 %</output></label><input id="efficiency" type="range" min="80" max="98" step="1" value="92"></div>
+        <button class="btn btn-primary" id="evaluate-sizing" type="button">Evaluar punto</button>
+      </div>
+    </section>
+
+    <section class="metric-row" aria-label="Márgenes de dimensionamiento">
+      <div class="metric"><span class="metric-label">Margen de potencia</span><strong class="metric-value" id="power-margin">−3,0 MW</strong></div>
+      <div class="metric"><span class="metric-label">Margen de energía útil</span><strong class="metric-value" id="energy-margin">−8,5 MWh</strong></div>
+      <div class="metric"><span class="metric-label">Autonomía calculada</span><strong class="metric-value" id="calculated-autonomy">2,6 h</strong></div>
+    </section>
+
+    <figure class="visual-stage" aria-labelledby="sizing-caption" data-model-class="reduced-order" data-evidence-type="E">
+      <svg id="sizing-svg" viewBox="0 0 900 470" role="img" aria-labelledby="sizing-title sizing-desc">
+        <title id="sizing-title">Plano potencia–energía del BESS</title>
+        <desc id="sizing-desc">El punto seleccionado se compara con la potencia requerida y la energía nominal requerida para la autonomía objetivo.</desc>
+        <rect id="fail-zone" class="chart-zone-fail" x="78" y="35" width="742" height="365"></rect>
+        <rect id="pass-zone" class="chart-zone-pass" x="420" y="35" width="400" height="210"></rect>
+        <line class="axis" x1="78" y1="400" x2="820" y2="400"></line>
+        <line class="axis" x1="78" y1="400" x2="78" y2="35"></line>
+        <line id="required-power-line" class="requirement-line" x1="420" y1="35" x2="420" y2="400"></line>
+        <line id="required-energy-line" class="requirement-line" x1="78" y1="245" x2="820" y2="245"></line>
+        <circle id="selected-sizing-point" class="selected-point" cx="310" cy="300" r="10"></circle>
+        <text id="selected-sizing-label" class="plot-label" x="326" y="292">5 MW · 24 MWh</text>
+        <text class="axis-label" x="400" y="450">Potencia instalada (MW)</text>
+        <text class="axis-label" x="18" y="220" transform="rotate(-90 18 220)">Energía nominal (MWh)</text>
+        <text class="plot-label" x="620" y="66">Zona que cumple ambos requisitos</text>
+        <text id="required-power-label" class="axis-label" x="430" y="388">Preq 8,0 MW</text>
+        <text id="required-energy-label" class="axis-label" x="88" y="235">Ereq nominal 37,3 MWh</text>
+        <text id="x-max-label" class="axis-label" x="800" y="424">20 MW</text>
+        <text id="y-max-label" class="axis-label" x="36" y="45">100 MWh</text>
+        <text class="axis-label" x="68" y="424">0</text>
+      </svg>
+      <figcaption id="sizing-caption" class="legend">
+        <span><span class="swatch swatch-frequency"></span>punto instalado</span>
+        <span><span class="swatch swatch-phase"></span>requisitos conservadores del escenario</span>
+      </figcaption>
+      <p class="status-line" id="sizing-status" aria-live="polite"><strong>Lectura:</strong> el punto inicial no cubre simultáneamente potencia y energía.</p>
+    </figure>
+
+    <div class="content-grid">
+      <section><h2>Restricción de potencia</h2><p><span class="evidence-tag">E</span> El ejemplo usa carga crítica más escalón adicional como requisito conservador. En proyecto se reemplaza por estudios de escalones, motores, P/Q, sobrecarga y ERNC mínima.</p></section>
+      <section><h2>Restricción de energía</h2><p><span class="evidence-tag">E</span> La energía útil descuenta eficiencia y ventana SOC. SOH, temperatura, auxiliares, disponibilidad y degradación exigirán márgenes adicionales del OEM.</p></section>
+      <section><h2>Lo que aún falta</h2><p><span class="evidence-tag">P</span> La selección real requiere perfiles 1–15 min, criticidad, clima, garantías, duty cycle, curva P–Q, derating y criterios de energía no servida.</p></section>
+    </div>
+
+    <details>
+      <summary>Ecuaciones, rango y fuentes</summary>
+      <code class="equation">Prequerida = Pcarga_crítica + Pescalón</code>
+      <code class="equation">Eútil = Enominal · ventana_SOC · ηdescarga</code>
+      <code class="equation">Enominal_requerida = Pcarga_crítica · tautonomía / (ventana_SOC · ηdescarga)</code>
+      <p>Estas ecuaciones son un filtro de factibilidad y no optimizan costo, confiabilidad, renovables, envejecimiento ni contingencias N−1.</p>
+      <ul>
+        <li><a href="../../Plan_Investigacion_Microrredes_Hibridas_Modo_Isla.md">Plan maestro, Frente 1 — arquitectura y dimensionamiento</a>.</li>
+        <li><a href="../../Checklist_Data_Room_y_OEM_Modo_Isla.md">Checklist — cargas, BESS, SOC/SOH y garantías</a>.</li>
+        <li><a href="../../Markdown/02_Operacion_Transicion_Modo_Isla/3)%20Aging%20aware%20operation%20of%20lithium-ion%20battery%20energy%20storage%20systems.md">Aging-aware operation of lithium-ion BESS</a>.</li>
+      </ul>
+    </details>
+
+    <nav class="page-nav" aria-label="Navegación entre módulos">
+      <a class="btn" href="arquitectura-bod.html">← Arquitectura y BoD</a>
+      <a class="btn btn-primary" href="estabilidad-control-gfm-gfl.html">Estabilidad y control →</a>
+    </nav>
+  </main>
+
+  <script src="shared.js"></script>
+  <script src="dimensionamiento.js"></script>
+</body>
+</html>
